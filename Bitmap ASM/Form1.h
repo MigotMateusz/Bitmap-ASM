@@ -1,10 +1,13 @@
 #include <thread>
 #include <String>
+#include <fstream>
+#include "utilities.h"
+
 #pragma once
 
 
 namespace CppCLRWinformsProjekt {
-
+	
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -12,6 +15,7 @@ namespace CppCLRWinformsProjekt {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
+	//using namespace msclr::interop;
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
 	public:
@@ -164,17 +168,14 @@ namespace CppCLRWinformsProjekt {
 #pragma endregion
 
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-		/*if(this->radioButton1->Checked)
-			this->label3->Text = "Cpp Dll checked";
-		else
-			this->label3->Text = "ASM Dll checked";
-		*/
-		//this->label3->Text = this->textBox1->Text;
-		this->label3->Text = comboBox1->Text;
-			//std::thread::hardware_concurrency().ToString();
+		String^ fileName = this->textBox1->Text;
+		String^ nThreads = this->comboBox1->Text;
+		if (validateStartingParameters(fileName, nThreads))
+			;
 
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
 }
 };
 }
+
