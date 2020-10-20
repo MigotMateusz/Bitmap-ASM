@@ -13,8 +13,9 @@ struct Image
 };
 
 
-bool validateStartingParameters(System::String^ fileName, System::String^ numberOfThreads);
+bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads);
 void readBMP(Image* image, char* filename);
-void saveBMP(Image* image);
+void saveBMP(Image* image, char* filename);
+bool checkFileExtension(char* fileName);
 #endif // !UTILITIES_H
 
