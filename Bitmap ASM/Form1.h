@@ -1,9 +1,8 @@
+#pragma once
 #include <thread>
 #include <String>
 #include <fstream>
 #include "utilities.h"
-
-#pragma once
 
 
 namespace CppCLRWinformsProjekt {
@@ -134,6 +133,7 @@ namespace CppCLRWinformsProjekt {
 			this->comboBox1->Size = System::Drawing::Size(121, 24);
 			this->comboBox1->TabIndex = 3;
 			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::comboBox1_SelectedIndexChanged);
+			this->comboBox1->SelectedIndex = this->comboBox1->FindStringExact(std::thread::hardware_concurrency().ToString());
 			// 
 			// label1
 			// 
@@ -237,6 +237,8 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// listView1
 			// 
+			this->listView1->Alignment = System::Windows::Forms::ListViewAlignment::Default;
+			this->listView1->GridLines = true;
 			this->listView1->HideSelection = false;
 			this->listView1->Location = System::Drawing::Point(791, 81);
 			this->listView1->Name = L"listView1";
@@ -311,6 +313,8 @@ namespace CppCLRWinformsProjekt {
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
+			readLogFile(this->listView1);
+
 		}
 #pragma endregion
 
@@ -323,8 +327,12 @@ namespace CppCLRWinformsProjekt {
 			isCppDllChecked = true;
 		else
 			isCppDllChecked = false;
-		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads))
-			;
+		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads)) {
+			addToLogFile(this->listView1, "new new new");
+			System::Windows::Forms::MessageBox::Show("Operacja zakoñczy³a siê poprawnie.", "Operacja zakoñczona",
+				System::Windows::Forms::MessageBoxButtons::OK);
+		}
+			
 
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {

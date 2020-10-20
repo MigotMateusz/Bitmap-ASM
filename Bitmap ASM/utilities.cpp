@@ -2,6 +2,8 @@
 #include <String>
 #include <fstream>
 #include "utilities.h"
+
+
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
 	char* infileName = new char[length];
@@ -79,4 +81,22 @@ bool checkFileExtension(char* fileName) {
 		return true;
 	else
 		return false;
+}
+
+void readLogFile(System::Windows::Forms::ListView^ listView) {
+	std::string dataLine;
+	std::ifstream inputFile("measures.txt", std::ios::in);
+	while (!inputFile.eof()) {
+		std::getline(inputFile, dataLine);
+		System::String^ text = gcnew System::String(dataLine.c_str());
+		listView->Items->Add(text);
+	}
+	inputFile.close();
+}
+void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure) {
+	System::String^ text = gcnew System::String(newMeasure.c_str());
+	listView->Items->Add(text);
+	std::fstream outputFile("measures.txt", std::ios::app);
+	outputFile << std::endl << newMeasure;
+	outputFile.close();
 }

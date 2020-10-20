@@ -17,5 +17,7 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 void readBMP(Image* image, char* filename);
 void saveBMP(Image* image, char* filename);
 bool checkFileExtension(char* fileName);
+void readLogFile(System::Windows::Forms::ListView^ listView);
+void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
 #endif // !UTILITIES_H
 
