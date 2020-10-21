@@ -19,5 +19,6 @@ void saveBMP(Image* image, char* filename);
 bool checkFileExtension(char* fileName);
 void readLogFile(System::Windows::Forms::ListView^ listView);
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
+void loadLibrary(System::Windows::Forms::ListView^ listView);
 #endif // !UTILITIES_H
 

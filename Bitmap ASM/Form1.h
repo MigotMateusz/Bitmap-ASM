@@ -133,7 +133,6 @@ namespace CppCLRWinformsProjekt {
 			this->comboBox1->Size = System::Drawing::Size(121, 24);
 			this->comboBox1->TabIndex = 3;
 			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::comboBox1_SelectedIndexChanged);
-			this->comboBox1->SelectedIndex = this->comboBox1->FindStringExact(std::thread::hardware_concurrency().ToString());
 			// 
 			// label1
 			// 
@@ -245,6 +244,7 @@ namespace CppCLRWinformsProjekt {
 			this->listView1->Size = System::Drawing::Size(181, 358);
 			this->listView1->TabIndex = 14;
 			this->listView1->UseCompatibleStateImageBehavior = false;
+			this->listView1->View = System::Windows::Forms::View::List;
 			// 
 			// label7
 			// 
@@ -312,9 +312,8 @@ namespace CppCLRWinformsProjekt {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->outputHistogramBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
-
 			readLogFile(this->listView1);
-
+			loadLibrary(this->listView1);
 		}
 #pragma endregion
 

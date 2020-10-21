@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bitmap ASM", "Bitmap ASM\Bitmap ASM.vcxproj", "{4408255A-23F6-40FA-8EF8-90C146E03E06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD} = {4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppDLL", "Cpp DLL\Cpp DLL.vcxproj", "{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +26,14 @@ Global
 		{4408255A-23F6-40FA-8EF8-90C146E03E06}.Release|x64.Build.0 = Release|x64
 		{4408255A-23F6-40FA-8EF8-90C146E03E06}.Release|x86.ActiveCfg = Release|Win32
 		{4408255A-23F6-40FA-8EF8-90C146E03E06}.Release|x86.Build.0 = Release|Win32
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Debug|x64.ActiveCfg = Debug|x64
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Debug|x64.Build.0 = Debug|x64
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Debug|x86.ActiveCfg = Debug|Win32
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Debug|x86.Build.0 = Debug|Win32
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Release|x64.ActiveCfg = Release|x64
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Release|x64.Build.0 = Release|x64
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Release|x86.ActiveCfg = Release|Win32
+		{4E009D01-AF66-4C2F-A2F1-0C1B8914CEBD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

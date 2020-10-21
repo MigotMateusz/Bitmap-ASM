@@ -3,6 +3,7 @@
 #include <fstream>
 #include "utilities.h"
 
+typedef std::string(_stdcall* MYPROC)();
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
@@ -91,7 +92,9 @@ void readLogFile(System::Windows::Forms::ListView^ listView) {
 		System::String^ text = gcnew System::String(dataLine.c_str());
 		listView->Items->Add(text);
 	}
-	inputFile.close();
+	inputFile.close(); 
+	
+	
 }
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure) {
 	System::String^ text = gcnew System::String(newMeasure.c_str());
@@ -99,4 +102,18 @@ void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMea
 	std::fstream outputFile("measures.txt", std::ios::app);
 	outputFile << std::endl << newMeasure;
 	outputFile.close();
+	
+}
+
+
+
+void loadLibrary(System::Windows::Forms::ListView^ listView) {
+	HINSTANCE hinstLib = LoadLibraryA("CppDLL.dll");
+	if (hinstLib != NULL) {
+		MYPROC ProcAdd = (MYPROC)GetProcAddress(hinstLib, "test");
+		if(ProcAdd != NULL)
+			listView->Items->Add(gcnew System::String(ProcAdd().c_str()));
+	}
+
+
 }
