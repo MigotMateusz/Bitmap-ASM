@@ -49,12 +49,14 @@ namespace CppCLRWinformsProjekt {
 
 	private: System::Windows::Forms::Label^ label5;
 	private: System::Windows::Forms::Label^ label6;
-	private: System::Windows::Forms::PictureBox^ inputHistogramBox;
-	private: System::Windows::Forms::PictureBox^ outputHistogramBox;
+
+
 	private: System::Windows::Forms::ListView^ listView1;
 	private: System::Windows::Forms::Label^ label7;
 	private: System::Windows::Forms::Label^ label8;
 	private: System::Windows::Forms::Label^ label9;
+	private: System::Windows::Forms::DataVisualization::Charting::Chart^ chart1;
+	private: System::Windows::Forms::DataVisualization::Charting::Chart^ chart2;
 
 	private:
 		System::ComponentModel::Container ^components;
@@ -63,6 +65,14 @@ namespace CppCLRWinformsProjekt {
 
 		void InitializeComponent(void)
 		{
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series3 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^ chartArea2 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series4 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series5 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^ series6 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->cppDllRadioBox = (gcnew System::Windows::Forms::RadioButton());
 			this->asmDllRadioBox = (gcnew System::Windows::Forms::RadioButton());
 			this->inputFileNameTextBox = (gcnew System::Windows::Forms::TextBox());
@@ -74,14 +84,14 @@ namespace CppCLRWinformsProjekt {
 			this->outputFileNameTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
 			this->label6 = (gcnew System::Windows::Forms::Label());
-			this->inputHistogramBox = (gcnew System::Windows::Forms::PictureBox());
-			this->outputHistogramBox = (gcnew System::Windows::Forms::PictureBox());
 			this->listView1 = (gcnew System::Windows::Forms::ListView());
 			this->label7 = (gcnew System::Windows::Forms::Label());
 			this->label8 = (gcnew System::Windows::Forms::Label());
 			this->label9 = (gcnew System::Windows::Forms::Label());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->inputHistogramBox))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->outputHistogramBox))->BeginInit();
+			this->chart1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
+			this->chart2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart1))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart2))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// cppDllRadioBox
@@ -206,22 +216,6 @@ namespace CppCLRWinformsProjekt {
 			this->label6->TabIndex = 11;
 			this->label6->Text = L"Nazwa wyjœciowa pliku";
 			// 
-			// inputHistogramBox
-			// 
-			this->inputHistogramBox->Location = System::Drawing::Point(84, 269);
-			this->inputHistogramBox->Name = L"inputHistogramBox";
-			this->inputHistogramBox->Size = System::Drawing::Size(304, 170);
-			this->inputHistogramBox->TabIndex = 12;
-			this->inputHistogramBox->TabStop = false;
-			// 
-			// outputHistogramBox
-			// 
-			this->outputHistogramBox->Location = System::Drawing::Point(446, 269);
-			this->outputHistogramBox->Name = L"outputHistogramBox";
-			this->outputHistogramBox->Size = System::Drawing::Size(304, 170);
-			this->outputHistogramBox->TabIndex = 13;
-			this->outputHistogramBox->TabStop = false;
-			// 
 			// listView1
 			// 
 			this->listView1->Alignment = System::Windows::Forms::ListViewAlignment::Default;
@@ -266,18 +260,83 @@ namespace CppCLRWinformsProjekt {
 			this->label9->TabIndex = 17;
 			this->label9->Text = L"Histogram po rozmyciu";
 			// 
+			// chart1
+			// 
+			chartArea1->AxisX->LabelStyle->Enabled = false;
+			chartArea1->AxisY->LabelStyle->Enabled = false;
+			chartArea1->Name = L"ChartArea1";
+			this->chart1->ChartAreas->Add(chartArea1);
+			this->chart1->Location = System::Drawing::Point(85, 269);
+			this->chart1->Name = L"chart1";
+			this->chart1->Palette = System::Windows::Forms::DataVisualization::Charting::ChartColorPalette::Bright;
+			series1->ChartArea = L"ChartArea1";
+			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series1->Color = System::Drawing::Color::Blue;
+			series1->LabelForeColor = System::Drawing::Color::Gray;
+			series1->MarkerColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(255)), static_cast<System::Int32>(static_cast<System::Byte>(192)),
+				static_cast<System::Int32>(static_cast<System::Byte>(192)));
+			series1->Name = L"Blue";
+			series2->ChartArea = L"ChartArea1";
+			series2->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series2->Color = System::Drawing::Color::Lime;
+			series2->Name = L"Green";
+			series3->ChartArea = L"ChartArea1";
+			series3->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series3->Color = System::Drawing::Color::Red;
+			series3->LabelBorderDashStyle = System::Windows::Forms::DataVisualization::Charting::ChartDashStyle::NotSet;
+			series3->Name = L"Red";
+			this->chart1->Series->Add(series1);
+			this->chart1->Series->Add(series2);
+			this->chart1->Series->Add(series3);
+			this->chart1->Size = System::Drawing::Size(304, 170);
+			this->chart1->TabIndex = 18;
+			this->chart1->Text = L"chart1";
+			// 
+			// chart2
+			// 
+			chartArea2->AxisX->LabelStyle->Enabled = false;
+			chartArea2->AxisY->LabelStyle->Enabled = false;
+			chartArea2->Name = L"ChartArea1";
+			this->chart2->ChartAreas->Add(chartArea2);
+			this->chart2->Location = System::Drawing::Point(446, 269);
+			this->chart2->Name = L"chart2";
+			this->chart2->Palette = System::Windows::Forms::DataVisualization::Charting::ChartColorPalette::Bright;
+			series4->ChartArea = L"ChartArea1";
+			series4->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series4->Color = System::Drawing::Color::Blue;
+			series4->LabelForeColor = System::Drawing::Color::Gray;
+			series4->MarkerColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(255)), static_cast<System::Int32>(static_cast<System::Byte>(192)),
+				static_cast<System::Int32>(static_cast<System::Byte>(192)));
+			series4->Name = L"Blue";
+			series5->ChartArea = L"ChartArea1";
+			series5->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series5->Color = System::Drawing::Color::Lime;
+			series5->Name = L"Green";
+			series6->ChartArea = L"ChartArea1";
+			series6->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series6->Color = System::Drawing::Color::Red;
+			series6->LabelBorderDashStyle = System::Windows::Forms::DataVisualization::Charting::ChartDashStyle::NotSet;
+			series6->Name = L"Red";
+			this->chart2->Series->Add(series4);
+			this->chart2->Series->Add(series5);
+			this->chart2->Series->Add(series6);
+			this->chart2->Size = System::Drawing::Size(304, 170);
+			this->chart2->TabIndex = 19;
+			this->chart2->Text = L"chart2";
+			this->chart2->Click += gcnew System::EventHandler(this, &Form1::chart2_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::SystemColors::ControlDark;
 			this->ClientSize = System::Drawing::Size(984, 461);
+			this->Controls->Add(this->chart2);
+			this->Controls->Add(this->chart1);
 			this->Controls->Add(this->label9);
 			this->Controls->Add(this->label8);
 			this->Controls->Add(this->label7);
 			this->Controls->Add(this->listView1);
-			this->Controls->Add(this->outputHistogramBox);
-			this->Controls->Add(this->inputHistogramBox);
 			this->Controls->Add(this->label6);
 			this->Controls->Add(this->label5);
 			this->Controls->Add(this->outputFileNameTextBox);
@@ -295,8 +354,8 @@ namespace CppCLRWinformsProjekt {
 			this->Name = L"Form1";
 			this->ShowIcon = false;
 			this->Text = L"Bitmap ASM";
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->inputHistogramBox))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->outputHistogramBox))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart1))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart2))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -312,8 +371,8 @@ namespace CppCLRWinformsProjekt {
 			isCppDllChecked = true;
 		else
 			isCppDllChecked = false;
-		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads)) {
-			addToLogFile(this->listView1, "new new new");
+		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads,this->chart1)) {
+
 			System::Windows::Forms::MessageBox::Show("Operacja zakoñczy³a siê poprawnie.", "Operacja zakoñczona",
 				System::Windows::Forms::MessageBoxButtons::OK);
 		}
@@ -321,6 +380,8 @@ namespace CppCLRWinformsProjekt {
 
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
+}
+private: System::Void chart2_Click(System::Object^ sender, System::EventArgs^ e) {
 }
 };
 }

@@ -1,12 +1,14 @@
 #include "pch.h"
 #include <String>
 #include <fstream>
+#include <iostream>
 #include "utilities.h"
 
 typedef std::string(_stdcall* MYPROC)();
 typedef int(_stdcall* MyProc)(int, int);
 
-bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads){
+bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
+	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1){
 	int length = inputfileName->Length;
 	char* infileName = new char[length];
 	sprintf(infileName, "%s", inputfileName);
@@ -39,8 +41,10 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 
 	else {
 		Image* image = new Image;
-		readBMP(image,infileName);
-		saveBMP(image, outfileName);
+		readBMP(image, infileName);
+		HINSTANCE lib = loadLibrary(dllType);
+		histogram(image, chart1);
+		//saveBMP(image, outfileName);
 		return true;
 	}		
 }
@@ -60,7 +64,6 @@ void readBMP(Image* image, char* filename)
 	image->pixels = reinterpret_cast<BYTE*>(image->data + image->file_header->bfOffBits);
 
 	inputFile.close();
-
 }
 void saveBMP(Image* image, char* filename)
 {
@@ -106,23 +109,28 @@ void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMea
 	
 }
 
+HINSTANCE loadLibrary(bool isCppChosen) {
+	HINSTANCE lib;
+	if (isCppChosen)
+		lib = LoadLibraryA("CppDLL.dll");
+	else
+		lib = LoadLibraryA("ASMDLL.dll");	 
+	return lib;
+}
 
-
-void loadLibrary(System::Windows::Forms::ListView^ listView) {
-	/*HINSTANCE hinstLib = LoadLibraryA("CppDLL.dll");
-	
-	if (hinstLib != NULL) {
-		MYPROC ProcAdd = (MYPROC)GetProcAddress(hinstLib, "test");
-		if(ProcAdd != NULL)
-			listView->Items->Add(gcnew System::String(ProcAdd().c_str()));
+void histogram(Image* image, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1) {
+	int r[256] = {},
+		g[256] = {},
+		b[256] = {};
+	for (int i = 0; i < image->size-3; i+=3) {	
+		b[(int)image->pixels[i]]++;
+		g[(int)image->pixels[i + 1]]++;
+		r[(int)image->pixels[i + 2]]++;
 	}
-	FreeLibrary(hinstLib);*/
-	HINSTANCE lib = LoadLibraryA("ASMDLL.dll");
-	if (lib != NULL) {
-		MyProc function = (MyProc)GetProcAddress(lib, "MyProc1");
-		listView->Items->Add(gcnew System::String(std::to_string(function(5,3)).c_str()));
+	for (int i = 0; i < 256; i++) {
+		chart1->Series[0]->Points->AddXY(i, b[i]);
+		chart1->Series[1]->Points->AddXY(i, g[i]);
+		chart1->Series[2]->Points->AddXY(i, r[i]);
 	}
-	//MyProc1 dodawanie = (MyProc1)GetProcAddress(dyn_asm, "MyProc1");
-	//dodawanie();
-	//listView->Items->Add(gcnew System::String(std::to_string(wynik).c_str()));
+		
 }

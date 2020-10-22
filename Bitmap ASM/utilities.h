@@ -13,12 +13,14 @@ struct Image
 };
 
 
-bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads);
+bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
+	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
 void readBMP(Image* image, char* filename);
 void saveBMP(Image* image, char* filename);
 bool checkFileExtension(char* fileName);
 void readLogFile(System::Windows::Forms::ListView^ listView);
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
-void loadLibrary(System::Windows::Forms::ListView^ listView);
+HINSTANCE loadLibrary(bool isCppChosen);
+void histogram(Image* image, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
 #endif // !UTILITIES_H
 
