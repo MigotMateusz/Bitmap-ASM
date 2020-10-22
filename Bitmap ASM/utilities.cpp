@@ -4,7 +4,7 @@
 #include "utilities.h"
 
 typedef std::string(_stdcall* MYPROC)();
-typedef int(_stdcall* MyProc1)(int, int);
+typedef int(_stdcall* MyProc)(int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
@@ -109,14 +109,20 @@ void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMea
 
 
 void loadLibrary(System::Windows::Forms::ListView^ listView) {
-	HINSTANCE hinstLib = LoadLibraryA("CppDLL.dll");
-	HINSTANCE dyn_asm = LoadLibraryA("ASMDLL.dll");
+	/*HINSTANCE hinstLib = LoadLibraryA("CppDLL.dll");
+	
 	if (hinstLib != NULL) {
 		MYPROC ProcAdd = (MYPROC)GetProcAddress(hinstLib, "test");
 		if(ProcAdd != NULL)
 			listView->Items->Add(gcnew System::String(ProcAdd().c_str()));
 	}
-	MyProc1 dodawanie = (MyProc1)GetProcAddress(dyn_asm, "MyProc1");
-	int wynik = dodawanie(5, 3);
-	listView->Items->Add(gcnew System::String(std::to_string(wynik).c_str()));
+	FreeLibrary(hinstLib);*/
+	HINSTANCE lib = LoadLibraryA("ASMDLL.dll");
+	if (lib != NULL) {
+		MyProc function = (MyProc)GetProcAddress(lib, "MyProc1");
+		listView->Items->Add(gcnew System::String(std::to_string(function(5,3)).c_str()));
+	}
+	//MyProc1 dodawanie = (MyProc1)GetProcAddress(dyn_asm, "MyProc1");
+	//dodawanie();
+	//listView->Items->Add(gcnew System::String(std::to_string(wynik).c_str()));
 }

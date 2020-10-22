@@ -15,29 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <None Include="functions.def">
       <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="functions.asm">
       <Filter>Pliki źródłowe</Filter>
     </MASM>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="functions.def">
-      <Filter>Pliki źródłowe</Filter>
-    </None>
   </ItemGroup>
 </Project>

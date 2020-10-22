@@ -43,7 +43,7 @@ namespace CppCLRWinformsProjekt {
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Button^ button1;
 	private: System::Windows::Forms::Label^ label2;
-	private: System::Windows::Forms::Label^ label3;
+
 	private: System::Windows::Forms::Label^ label4;
 	private: System::Windows::Forms::TextBox^ outputFileNameTextBox;
 
@@ -70,7 +70,6 @@ namespace CppCLRWinformsProjekt {
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->label2 = (gcnew System::Windows::Forms::Label());
-			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->outputFileNameTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
@@ -165,17 +164,6 @@ namespace CppCLRWinformsProjekt {
 			this->label2->Size = System::Drawing::Size(179, 17);
 			this->label2->TabIndex = 6;
 			this->label2->Text = L"Wybór funkcji bibliotecznej:";
-			// 
-			// label3
-			// 
-			this->label3->AutoSize = true;
-			this->label3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(238)));
-			this->label3->Location = System::Drawing::Point(653, 157);
-			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(45, 16);
-			this->label3->TabIndex = 7;
-			this->label3->Text = L"label3";
 			// 
 			// label4
 			// 
@@ -294,7 +282,6 @@ namespace CppCLRWinformsProjekt {
 			this->Controls->Add(this->label5);
 			this->Controls->Add(this->outputFileNameTextBox);
 			this->Controls->Add(this->label4);
-			this->Controls->Add(this->label3);
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->label1);
@@ -312,8 +299,7 @@ namespace CppCLRWinformsProjekt {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->outputHistogramBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
-			readLogFile(this->listView1);
-			loadLibrary(this->listView1);
+
 		}
 #pragma endregion
 
