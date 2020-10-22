@@ -8,7 +8,7 @@ typedef std::string(_stdcall* MYPROC)();
 typedef int(_stdcall* MyProc)(int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
-	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1){
+	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2){
 	int length = inputfileName->Length;
 	char* infileName = new char[length];
 	sprintf(infileName, "%s", inputfileName);
@@ -44,6 +44,9 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 		readBMP(image, infileName);
 		HINSTANCE lib = loadLibrary(dllType);
 		histogram(image, chart1);
+		//tutaj rozmycie
+		gaussBlur(image);
+		histogram(image, chart2);
 		//saveBMP(image, outfileName);
 		return true;
 	}		
@@ -133,4 +136,21 @@ void histogram(Image* image, System::Windows::Forms::DataVisualization::Charting
 		chart1->Series[2]->Points->AddXY(i, r[i]);
 	}
 		
+}
+void gaussBlur(Image* image) {
+	int matrix[] = {
+		1, 2, 1,
+		2, 4, 2,
+		1, 2, 1
+	};
+	int length = image->info_header->biWidth * 3;
+	int size = image->size - image->file_header->bfOffBits;
+	for (int i = 0; i < size; i += 3) {
+		if((i - length - 3) >= 0 && (i - length + 3) >= 0 && (i - length + 3) < size && (i + length - 3)>=0 && (i + length - 3) < size)
+			int newPixel = image->pixels[i - length - 3] * matrix[0] + image->pixels[i - length] * matrix[1] + image->pixels[i - length + 3] * matrix[2] +
+				image->pixels[i - 3] * matrix[3] + image->pixels[i] * matrix[4] + image->pixels[i + 3] * matrix[5] +
+				image->pixels[i + length - 3] * matrix[6] + image->pixels[i + length] * matrix[7] + image->pixels[i + length + 3] * matrix[8];
+			image->pixels[i];
+
+	}
 }

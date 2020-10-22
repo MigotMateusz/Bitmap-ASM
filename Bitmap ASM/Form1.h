@@ -371,7 +371,7 @@ namespace CppCLRWinformsProjekt {
 			isCppDllChecked = true;
 		else
 			isCppDllChecked = false;
-		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads,this->chart1)) {
+		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads,this->chart1,this->chart2)) {
 
 			System::Windows::Forms::MessageBox::Show("Operacja zakoñczy³a siê poprawnie.", "Operacja zakoñczona",
 				System::Windows::Forms::MessageBoxButtons::OK);
