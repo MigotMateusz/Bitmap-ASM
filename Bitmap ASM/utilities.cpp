@@ -2,10 +2,14 @@
 #include <String>
 #include <fstream>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <vector>
 #include "utilities.h"
 
-typedef std::string(_stdcall* MYPROC)();
 typedef int(_stdcall* MyProc)(int, int);
+typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
+typedef void(_stdcall* MyFunc2)(BYTE*, int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
 	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2){
@@ -43,11 +47,20 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 		Image* image = new Image;
 		readBMP(image, infileName);
 		HINSTANCE lib = loadLibrary(dllType);
-		histogram(image, chart1);
-		//tutaj rozmycie
-		gaussBlur(image);
-		histogram(image, chart2);
-		//saveBMP(image, outfileName);
+		MyFunc1 histogram = (MyFunc1)GetProcAddress(lib, "histogram");
+		MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(lib, "gaussBlur");
+		int red[256] = {}, green[256] = {}, blue[256] = {};
+		int red1[256] = {}, green1[256] = {}, blue1[256] = {};
+		std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+		histogram(image->pixels, image->size, red, green, blue);
+		gaussBlur(image->pixels, image->size, image->info_header->biWidth);
+		histogram(image->pixels, image->size, red1, green1, blue1);
+		std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+		auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+		std::cerr << "Time: " << time << std::endl;
+		showHistogram(red, green, blue, chart1);
+		showHistogram(red1, green1, blue1, chart2);
+		saveBMP(image, outfileName);
 		return true;
 	}		
 }
@@ -121,36 +134,10 @@ HINSTANCE loadLibrary(bool isCppChosen) {
 	return lib;
 }
 
-void histogram(Image* image, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1) {
-	int r[256] = {},
-		g[256] = {},
-		b[256] = {};
-	for (int i = 0; i < image->size-3; i+=3) {	
-		b[(int)image->pixels[i]]++;
-		g[(int)image->pixels[i + 1]]++;
-		r[(int)image->pixels[i + 2]]++;
-	}
+void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1) {
 	for (int i = 0; i < 256; i++) {
 		chart1->Series[0]->Points->AddXY(i, b[i]);
 		chart1->Series[1]->Points->AddXY(i, g[i]);
 		chart1->Series[2]->Points->AddXY(i, r[i]);
-	}
-		
-}
-void gaussBlur(Image* image) {
-	int matrix[] = {
-		1, 2, 1,
-		2, 4, 2,
-		1, 2, 1
-	};
-	int length = image->info_header->biWidth * 3;
-	int size = image->size - image->file_header->bfOffBits;
-	for (int i = 0; i < size; i += 3) {
-		if((i - length - 3) >= 0 && (i - length + 3) >= 0 && (i - length + 3) < size && (i + length - 3)>=0 && (i + length - 3) < size)
-			int newPixel = image->pixels[i - length - 3] * matrix[0] + image->pixels[i - length] * matrix[1] + image->pixels[i - length + 3] * matrix[2] +
-				image->pixels[i - 3] * matrix[3] + image->pixels[i] * matrix[4] + image->pixels[i + 3] * matrix[5] +
-				image->pixels[i + length - 3] * matrix[6] + image->pixels[i + length] * matrix[7] + image->pixels[i + length + 3] * matrix[8];
-			image->pixels[i];
-
 	}
 }

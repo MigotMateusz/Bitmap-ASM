@@ -7,4 +7,5 @@
 #endif
 #include <string>
 
-extern "C" std::string CppDll_API test();
+extern "C" void CppDll_API histogram(BYTE * pixels, int size, int* r, int* g, int* b);
+extern "C" void CppDll_API gaussBlur(BYTE * inputPixels, int size, int imageWidth);

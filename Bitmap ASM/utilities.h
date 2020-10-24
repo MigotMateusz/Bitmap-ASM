@@ -21,7 +21,6 @@ bool checkFileExtension(char* fileName);
 void readLogFile(System::Windows::Forms::ListView^ listView);
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
 HINSTANCE loadLibrary(bool isCppChosen);
-void histogram(Image* image, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
-void gaussBlur(Image* image);
+void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
 #endif // !UTILITIES_H
 
