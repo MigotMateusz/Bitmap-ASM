@@ -10,14 +10,14 @@ void histogram(BYTE* pixels, int size, int *r, int *g, int* b) {
 		r[(int)pixels[i + 2]]++;
 	}
 }
-void gaussBlur(BYTE* inputPixels,int size, int imageWidth) {
+void gaussBlur(BYTE* inputPixels,int size, int imageWidth, int startHeight, int endHeight) {
 	int matrix[] = {
 	1, 2, 1,
 	2, 4, 2,
 	1, 2, 1
 	};
 	int length = imageWidth * 3;
-	for (int i = 0; i < size; i += 3) {
+	for (int i = length * startHeight; i < length * endHeight; i += 3) {
 		if ((i - length - 3) >= 0 && (i - length + 3) >= 0 && (i - length + 3) < size && (i + length - 3) >= 0 && (i + length - 3) < size) {
 			int newPixel1 = inputPixels[i - length - 3] * matrix[0] + inputPixels[i - length] * matrix[1] + inputPixels[i - length + 3] * matrix[2] +
 				inputPixels[i - 3] * matrix[3] + inputPixels[i] * matrix[4] + inputPixels[i + 3] * matrix[5] +

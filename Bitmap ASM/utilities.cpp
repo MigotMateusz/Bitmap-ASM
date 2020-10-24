@@ -9,7 +9,7 @@
 
 typedef int(_stdcall* MyProc)(int, int);
 typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
-typedef void(_stdcall* MyFunc2)(BYTE*, int, int);
+typedef void(_stdcall* MyFunc2)(BYTE*, int, int, int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
 	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2){
@@ -53,7 +53,8 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 		int red1[256] = {}, green1[256] = {}, blue1[256] = {};
 		std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 		histogram(image->pixels, image->size, red, green, blue);
-		gaussBlur(image->pixels, image->size, image->info_header->biWidth);
+		//gaussBlur(image->pixels, image->size, image->info_header->biWidth);
+		runFunction(lib, image, 2);
 		histogram(image->pixels, image->size, red1, green1, blue1);
 		std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 		auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
@@ -139,5 +140,18 @@ void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualiza
 		chart1->Series[0]->Points->AddXY(i, b[i]);
 		chart1->Series[1]->Points->AddXY(i, g[i]);
 		chart1->Series[2]->Points->AddXY(i, r[i]);
+	}
+}
+void runFunction(HINSTANCE library, Image* image, short threadNumber) {
+	MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(library, "gaussBlur");
+	int divideParts = image->info_header->biHeight / threadNumber;
+	std::thread *threads = new std::thread[threadNumber];
+	for (int i = 0; i < threadNumber - 1; i++) {
+		threads[i] = std::thread(gaussBlur, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
+	}
+	threads[threadNumber - 1] = std::thread(gaussBlur, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
+		image->info_header->biHeight - 1);
+	for (int i = 0; i < threadNumber - 1; i++) {
+		threads[i].join();
 	}
 }

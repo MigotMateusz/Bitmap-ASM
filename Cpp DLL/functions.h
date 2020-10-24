@@ -8,4 +8,4 @@
 #include <string>
 
 extern "C" void CppDll_API histogram(BYTE * pixels, int size, int* r, int* g, int* b);
-extern "C" void CppDll_API gaussBlur(BYTE * inputPixels, int size, int imageWidth);
+extern "C" void CppDll_API gaussBlur(BYTE * inputPixels, int size, int imageWidth, int startHeight, int endHeight);

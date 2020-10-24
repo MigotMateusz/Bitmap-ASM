@@ -22,5 +22,6 @@ void readLogFile(System::Windows::Forms::ListView^ listView);
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
 HINSTANCE loadLibrary(bool isCppChosen);
 void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
+void runFunction(HINSTANCE library, Image* image, short threadNumber);
 #endif // !UTILITIES_H
 
