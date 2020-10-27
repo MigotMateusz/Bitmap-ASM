@@ -6,8 +6,6 @@
 * v0.2 - dzia³aj¹ce funkcje biblioteczne napisane w jêzyku wysokiego poziomu, skoñczone GUI programu g³ównego
 * Zmiany wzglêdem v0.1 - dodana implementacja w¹tków oraz zapis czasu wykonania siê funkcji do pliku
 */
-#pragma once
-
 #ifdef CppDll_API_EXPORTS
 	#define CppDll_API __declspec(dllexport)
 #else

@@ -375,8 +375,6 @@ namespace CppCLRWinformsProjekt {
 				System::Windows::Forms::MessageBoxButtons::OK);
 			addToLogFile(this->listView1, std::to_string(timeElapsed));
 		}
-			
-
 	}
 };
 }

@@ -46,6 +46,7 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 	else
 		return true;
 }
+
 long long runFunctions(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads, bool dllType, 
 	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2) {
 	int length = inputfileName->Length;
@@ -62,15 +63,16 @@ long long runFunctions(System::String^ inputfileName, System::String^ outputfile
 	Image* image = new Image;
 	readBMP(image, infileName);
 	HINSTANCE lib = loadLibrary(dllType);
-	MyFunc1 histogram = (MyFunc1)GetProcAddress(lib, "histogram");
-	MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(lib, "gaussBlur");
+
 	int red[256] = {}, green[256] = {}, blue[256] = {};
 	int red1[256] = {}, green1[256] = {}, blue1[256] = {};
+
 	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-	histogram(image->pixels, image->size, red, green, blue);
-	runFunction(lib, image, 2, red1, green1, blue1);
-	//histogram(image->pixels, image->size, red1, green1, blue1);
+	runHistogramFunction(lib, image, 2, red, green, blue);
+	runBlurFunction(lib, image, 2);
+	runHistogramFunction(lib, image, 2, red1, green1, blue1);
 	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time: " << time << std::endl;
 	showHistogram(red, green, blue, chart1);
@@ -155,27 +157,46 @@ void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualiza
 	}
 }
 
-void runFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b) {
+void runBlurFunction(HINSTANCE library, Image* image, short threadNumber) {
 	MyFunc2 gaussBlur1 = (MyFunc2)GetProcAddress(library, "gaussBlur");
-	Pom1 histogram2 = (Pom1)GetProcAddress(library, "histogram2");
 	int divideParts = image->info_header->biHeight / threadNumber;	
 	std::thread *threads = new std::thread[threadNumber];
-	for (int i = 0; i < threadNumber - 1; i++) {
+
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < threadNumber - 1; i++)
 		threads[i] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
-	}
+
 	threads[threadNumber - 1] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
 		image->info_header->biHeight - 1);
-	for (int i = 0; i < threadNumber - 1; i++) {
+
+	for (int i = 0; i < threadNumber - 1; i++)
 		threads[i].join();
-	}
-	
-	std::thread* threads2 = new std::thread[threadNumber];
-	for (int i = 0; i < threadNumber - 1; i++) {
-		threads2[i] = std::thread(histogram2, image->pixels, image->info_header->biWidth, i*divideParts, (i+1)*divideParts, r, g, b);
-	}
-	threads2[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts, image->info_header->biHeight - 1
-		, r, g, b);
-	for (int i = 0; i < threadNumber - 1; i++) {
-		threads2[i].join();
-	}
+
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	std::cerr << "Time Blur: " << time << std::endl;
+}
+
+void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b) {
+	Pom1 histogram2 = (Pom1)GetProcAddress(library, "histogram2");
+	int divideParts = image->info_header->biHeight / threadNumber;
+	std::thread* threads = new std::thread[threadNumber];
+
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i] = std::thread(histogram2, image->pixels, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts, r, g, b);
+
+	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
+		image->info_header->biHeight - 1, r, g, b);
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i].join();
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	std::cerr << "Time histogram: " << time << std::endl;
+
 }

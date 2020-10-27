@@ -10,14 +10,16 @@ void histogram(BYTE* pixels, int size, int *r, int *g, int* b) {
 		r[(int)pixels[i + 2]]++;
 	}
 }
+
 void histogram2(BYTE* pixels, int imageWidth, int startHeight, int endHeight, int* r, int* g, int* b) {
 	int width = imageWidth * 3;
-	for (int i = width*startHeight; i < width * endHeight - 2; i += 3) {
+	for (int i = width * startHeight; i < width * endHeight - 2; i += 3) {
 		b[(int)pixels[i]]++;
 		g[(int)pixels[i + 1]]++;
 		r[(int)pixels[i + 2]]++;
 	}
 }
+
 void gaussBlur(BYTE* inputPixels,int size, int imageWidth, int startHeight, int endHeight) {
 	int matrix[] = {
 	1, 2, 1,
