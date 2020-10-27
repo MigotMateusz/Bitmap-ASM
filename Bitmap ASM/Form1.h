@@ -141,7 +141,6 @@ namespace CppCLRWinformsProjekt {
 			this->comboBox1->Name = L"comboBox1";
 			this->comboBox1->Size = System::Drawing::Size(121, 24);
 			this->comboBox1->TabIndex = 3;
-			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::comboBox1_SelectedIndexChanged);
 			// 
 			// label1
 			// 
@@ -323,7 +322,6 @@ namespace CppCLRWinformsProjekt {
 			this->chart2->Size = System::Drawing::Size(304, 170);
 			this->chart2->TabIndex = 19;
 			this->chart2->Text = L"chart2";
-			this->chart2->Click += gcnew System::EventHandler(this, &Form1::chart2_Click);
 			// 
 			// Form1
 			// 
@@ -358,7 +356,7 @@ namespace CppCLRWinformsProjekt {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart2))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
-
+			readLogFile(this->listView1);
 		}
 #pragma endregion
 
@@ -371,18 +369,15 @@ namespace CppCLRWinformsProjekt {
 			isCppDllChecked = true;
 		else
 			isCppDllChecked = false;
-		if (validateStartingParameters(inputfileName, outputfileName, isCppDllChecked, nThreads,this->chart1,this->chart2)) {
-
+		if (validateStartingParameters(inputfileName, outputfileName, nThreads)) {
+			int timeElapsed = runFunctions(inputfileName, outputfileName, nThreads, isCppDllChecked, this->chart1, this->chart2);
 			System::Windows::Forms::MessageBox::Show("Operacja zakoñczy³a siê poprawnie.", "Operacja zakoñczona",
 				System::Windows::Forms::MessageBoxButtons::OK);
+			addToLogFile(this->listView1, std::to_string(timeElapsed));
 		}
 			
 
 	}
-private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
-}
-private: System::Void chart2_Click(System::Object^ sender, System::EventArgs^ e) {
-}
 };
 }
 

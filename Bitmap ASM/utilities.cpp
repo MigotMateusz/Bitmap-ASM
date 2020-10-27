@@ -10,9 +10,9 @@
 typedef int(_stdcall* MyProc)(int, int);
 typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
 typedef void(_stdcall* MyFunc2)(BYTE*, int, int, int, int);
+typedef void(_stdcall* Pom1)(BYTE*, int, int, int, int*, int*, int*);
 
-bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, bool dllType, System::String^ numberOfThreads,
-	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2){
+bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
 	char* infileName = new char[length];
 	sprintf(infileName, "%s", inputfileName);
@@ -43,27 +43,40 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 		return false;
 	}
 
-	else {
-		Image* image = new Image;
-		readBMP(image, infileName);
-		HINSTANCE lib = loadLibrary(dllType);
-		MyFunc1 histogram = (MyFunc1)GetProcAddress(lib, "histogram");
-		MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(lib, "gaussBlur");
-		int red[256] = {}, green[256] = {}, blue[256] = {};
-		int red1[256] = {}, green1[256] = {}, blue1[256] = {};
-		std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-		histogram(image->pixels, image->size, red, green, blue);
-		//gaussBlur(image->pixels, image->size, image->info_header->biWidth);
-		runFunction(lib, image, 2);
-		histogram(image->pixels, image->size, red1, green1, blue1);
-		std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-		auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-		std::cerr << "Time: " << time << std::endl;
-		showHistogram(red, green, blue, chart1);
-		showHistogram(red1, green1, blue1, chart2);
-		saveBMP(image, outfileName);
+	else
 		return true;
-	}		
+}
+long long runFunctions(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads, bool dllType, 
+	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2) {
+	int length = inputfileName->Length;
+	char* infileName = new char[length];
+	sprintf(infileName, "%s", inputfileName);
+
+	length = outputfileName->Length;
+	char* outfileName = new char[length];
+	sprintf(outfileName, "%s", outputfileName);
+
+	char* pomThreads = new char[2];
+	sprintf(pomThreads, "%s", numberOfThreads);
+
+	Image* image = new Image;
+	readBMP(image, infileName);
+	HINSTANCE lib = loadLibrary(dllType);
+	MyFunc1 histogram = (MyFunc1)GetProcAddress(lib, "histogram");
+	MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(lib, "gaussBlur");
+	int red[256] = {}, green[256] = {}, blue[256] = {};
+	int red1[256] = {}, green1[256] = {}, blue1[256] = {};
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+	histogram(image->pixels, image->size, red, green, blue);
+	runFunction(lib, image, 2, red1, green1, blue1);
+	//histogram(image->pixels, image->size, red1, green1, blue1);
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	std::cerr << "Time: " << time << std::endl;
+	showHistogram(red, green, blue, chart1);
+	showHistogram(red1, green1, blue1, chart2);
+	saveBMP(image, outfileName);
+	return time;
 }
 
 void readBMP(Image* image, char* filename)
@@ -82,6 +95,7 @@ void readBMP(Image* image, char* filename)
 
 	inputFile.close();
 }
+
 void saveBMP(Image* image, char* filename)
 {
 	std::ofstream outputFile(filename, std::ios::out | std::ios::binary);
@@ -114,16 +128,14 @@ void readLogFile(System::Windows::Forms::ListView^ listView) {
 		listView->Items->Add(text);
 	}
 	inputFile.close(); 
-	
-	
 }
+
 void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure) {
 	System::String^ text = gcnew System::String(newMeasure.c_str());
 	listView->Items->Add(text);
 	std::fstream outputFile("measures.txt", std::ios::app);
 	outputFile << std::endl << newMeasure;
 	outputFile.close();
-	
 }
 
 HINSTANCE loadLibrary(bool isCppChosen) {
@@ -142,16 +154,28 @@ void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualiza
 		chart1->Series[2]->Points->AddXY(i, r[i]);
 	}
 }
-void runFunction(HINSTANCE library, Image* image, short threadNumber) {
-	MyFunc2 gaussBlur = (MyFunc2)GetProcAddress(library, "gaussBlur");
-	int divideParts = image->info_header->biHeight / threadNumber;
+
+void runFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b) {
+	MyFunc2 gaussBlur1 = (MyFunc2)GetProcAddress(library, "gaussBlur");
+	Pom1 histogram2 = (Pom1)GetProcAddress(library, "histogram2");
+	int divideParts = image->info_header->biHeight / threadNumber;	
 	std::thread *threads = new std::thread[threadNumber];
 	for (int i = 0; i < threadNumber - 1; i++) {
-		threads[i] = std::thread(gaussBlur, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
+		threads[i] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
 	}
-	threads[threadNumber - 1] = std::thread(gaussBlur, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
+	threads[threadNumber - 1] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
 		image->info_header->biHeight - 1);
 	for (int i = 0; i < threadNumber - 1; i++) {
 		threads[i].join();
+	}
+	
+	std::thread* threads2 = new std::thread[threadNumber];
+	for (int i = 0; i < threadNumber - 1; i++) {
+		threads2[i] = std::thread(histogram2, image->pixels, image->info_header->biWidth, i*divideParts, (i+1)*divideParts, r, g, b);
+	}
+	threads2[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts, image->info_header->biHeight - 1
+		, r, g, b);
+	for (int i = 0; i < threadNumber - 1; i++) {
+		threads2[i].join();
 	}
 }
