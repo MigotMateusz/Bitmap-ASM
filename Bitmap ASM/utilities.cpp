@@ -150,6 +150,9 @@ HINSTANCE loadLibrary(bool isCppChosen) {
 }
 
 void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1) {
+	chart1->Series[0]->Points->Clear();
+	chart1->Series[1]->Points->Clear();
+	chart1->Series[2]->Points->Clear();
 	for (int i = 0; i < 256; i++) {
 		chart1->Series[0]->Points->AddXY(i, b[i]);
 		chart1->Series[1]->Points->AddXY(i, g[i]);

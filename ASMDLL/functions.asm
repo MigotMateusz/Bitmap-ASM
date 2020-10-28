@@ -1,4 +1,3 @@
-;-------------------------------------------------------------------------
 .386
 .model flat,stdcall
 .stack 4096
@@ -21,5 +20,9 @@ Neg y
 ret
 MyProc1 endp
 
+Histogram proc BMP: PTR BYTE, imageSize: DWORD, red: PTR DWORD, green: PTR DWORD, blue: PTR DWORD 
+xor eax,eax 
+ret
+Histogram endp
+
 end MyProc1
-;-------------------------------------------------------------------------
