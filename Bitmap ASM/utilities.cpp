@@ -8,7 +8,8 @@
 #include "utilities.h"
 
 typedef int(_stdcall* MyProc)(int, int);
-typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
+typedef void(_stdcall* MyFunc1)(BYTE*, int, int, int, int*, int*, int*);
+//typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
 typedef void(_stdcall* MyFunc2)(BYTE*, int, int, int, int);
 typedef void(_stdcall* Pom1)(BYTE*, int, int, int, int*, int*, int*);
 
@@ -75,9 +76,13 @@ long long runFunctions(System::String^ inputfileName, System::String^ outputfile
 
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time: " << time << std::endl;
-	showHistogram(red, green, blue, chart1);
-	showHistogram(red1, green1, blue1, chart2);
+	//showHistogram(red, green, blue, chart1);
+	//showHistogram(red1, green1, blue1, chart2);
 	saveBMP(image, outfileName);
+	int red2[256] = {}, green2[256] = {}, blue2[256] = {};
+	test(image, 2, red2, green2, blue2);
+	showHistogram(red1, green1, blue1, chart1);
+	showHistogram(red2, green2, blue2, chart2);
 	return time;
 }
 
@@ -202,4 +207,26 @@ void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, i
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time histogram: " << time << std::endl;
 
+}
+
+void test(Image* image, short threadNumber, int* r, int* g, int* b) {
+	HINSTANCE lib = LoadLibraryA("ASMDLL.dll");
+	MyFunc1 histogram2 = (MyFunc1)GetProcAddress(lib, "Histogram");
+	int divideParts = image->info_header->biHeight / threadNumber;
+	std::thread* threads = new std::thread[threadNumber];
+
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i] = std::thread(histogram2, image->pixels, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts, r, g, b);
+
+	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts,
+		image->info_header->biHeight - 1, r, g, b);
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i].join();
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	std::cerr << "Time histogramASM: " << time << std::endl;
 }
