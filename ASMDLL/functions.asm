@@ -112,4 +112,44 @@ Koniec:
 ret
 Histogram endp
 
+GaussBlur proc BMP: PTR BYTE, bmpSize: DWORD, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD
+LOCAL   imgWidth:DWORD
+
+mov eax, imageWidth
+mov ebx, 3
+mul ebx ; width
+mov [imgWidth], eax
+mov ebx, startHeight
+mul ebx 
+mov ecx, eax
+mov eax, [imgWidth]
+mov ebx, endHeight
+mul ebx
+mov endPoint, eax
+
+mainLoop:
+; i-width-3>=0
+mov eax, ecx
+sub eax, [imgWidth]
+sub eax, 3
+cmp eax, 0
+jb mainLoop
+
+; i +width+3 <size
+mov eax, ecx
+add eax, [imgWidth]
+add eax, 3
+cmp eax, bmpSize
+jae mainLoop
+
+
+add ecx,3
+
+cmp ecx, endPoint
+jae Koniec
+jmp mainLoop
+Koniec:
+ret
+GaussBlur endp
+
 end MyProc1

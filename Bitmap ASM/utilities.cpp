@@ -80,6 +80,7 @@ long long runFunctions(System::String^ inputfileName, System::String^ outputfile
 	//showHistogram(red1, green1, blue1, chart2);
 	saveBMP(image, outfileName);
 	int red2[256] = {}, green2[256] = {}, blue2[256] = {};
+	runBlurFunctionASM(image, 2);
 	test(image, 2, red2, green2, blue2);
 	showHistogram(red1, green1, blue1, chart1);
 	showHistogram(red2, green2, blue2, chart2);
@@ -229,4 +230,26 @@ void test(Image* image, short threadNumber, int* r, int* g, int* b) {
 
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time histogramASM: " << time << std::endl;
+}
+void runBlurFunctionASM(Image* image, short threadNumber) {
+	HINSTANCE library = LoadLibraryA("ASMDLL.dll");
+	MyFunc2 gaussBlur1 = (MyFunc2)GetProcAddress(library, "GaussBlur");
+	int divideParts = image->info_header->biHeight / threadNumber;
+	std::thread* threads = new std::thread[threadNumber];
+
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
+
+	threads[threadNumber - 1] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts,
+		image->info_header->biHeight - 1);
+
+	for (int i = 0; i < threadNumber - 1; i++)
+		threads[i].join();
+
+	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+
+	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+	std::cerr << "Time BlurASM: " << time << std::endl;
 }

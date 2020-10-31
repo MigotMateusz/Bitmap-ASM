@@ -57,7 +57,7 @@ void gaussBlur1(BYTE* inputPixels, int size, int imageWidth, int startHeight, in
 	int oneDimensionalKernel[3] = { 1, 2, 1 };
 	int width = imageWidth * 3;
 	for (int i = width * startHeight; i < width * endHeight; i += 3) {
-		if ((i - width - 3) >= 0 && (i - width + 3) >= 0 && (i - width + 3) < size && (i + width - 3) >= 0 && (i + width - 3) < size) {
+		if ((i - width - 3) >= 0 && (i + width + 3) < size) {
 			int newPixel1 = inputPixels[i - 3] * oneDimensionalKernel[0] + inputPixels[i] * oneDimensionalKernel[1] + inputPixels[i + 3] * oneDimensionalKernel[2] +
 				inputPixels[i - width - 3] * oneDimensionalKernel[0] + inputPixels[i] * oneDimensionalKernel[1] + inputPixels[i + width + 3] * oneDimensionalKernel[2];
 			int newPixel2 = inputPixels[i + 1 - 3] * oneDimensionalKernel[0] + inputPixels[i + 1] * oneDimensionalKernel[1] + inputPixels[i + 1 + 3] * oneDimensionalKernel[2] +
