@@ -37,36 +37,37 @@ Histogram proc BMP: PTR BYTE, imageWidth: DWORD, startHeight: DWORD, endHeight: 
 mov eax, imageWidth
 mov ebx, 3
 mul ebx ; width
-mov ebx, endHeight
+mov ebx, startHeight
 mul ebx 
-sub eax, 3
 mov ecx, eax
 mov eax, imageWidth
 mov ebx, 3
 mul ebx ; width
-mov ebx, startHeight
+mov ebx, endHeight
 mul ebx
+;sub eax, 2
 mov endPoint, eax
 
 mainLoop:
 
-dec ecx
+;dec ecx
 
 mov         eax,dword ptr [BMP]  
 add         eax, ecx  
 mov         ebx, ecx
 movzx       ecx,byte ptr [eax]
-mov         edx,dword ptr [red]
+mov         edx,dword ptr [blue]
 mov         eax,dword ptr [edx+ecx*4]  
 add         eax,1 
 mov         ecx,dword ptr [BMP]  
 add         ecx,dword ptr ebx  
 movzx       edx,byte ptr [ecx]  
-mov         ecx,dword ptr [red]  
+mov         ecx,dword ptr [blue]  
 mov         dword ptr [ecx+edx*4],eax
 mov         ecx,ebx  
 
-dec ecx
+;dec ecx
+inc ecx
 
 
 mov         eax,dword ptr [BMP]  
@@ -83,26 +84,29 @@ mov         ecx,dword ptr [green]
 mov         dword ptr [ecx+edx*4],eax
 mov         ecx,ebx  
 
-dec ecx
+;dec ecx
+inc ecx
 
-jz Koniec
+;jz Koniec
 
 mov         eax,dword ptr [BMP]  
 add         eax, ecx  
 mov         ebx, ecx
 movzx       ecx,byte ptr [eax]
-mov         edx,dword ptr [blue]
+mov         edx,dword ptr [red]
 mov         eax,dword ptr [edx+ecx*4]  
 add         eax,1 
 mov         ecx,dword ptr [BMP]  
 add         ecx,dword ptr ebx  
 movzx       edx,byte ptr [ecx]  
-mov         ecx,dword ptr [blue]  
+mov         ecx,dword ptr [red]  
 mov         dword ptr [ecx+edx*4],eax
 mov         ecx,ebx
 
+inc ecx
+
 cmp ecx, endPoint
-jb Koniec
+jae Koniec
 jmp mainLoop ;jezeli licznik nie jest rowny 0, idz do poczatku petli
 Koniec:
 ret

@@ -223,7 +223,7 @@ void test(Image* image, short threadNumber, int* r, int* g, int* b) {
 	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts,
 		image->info_header->biHeight - 1, r, g, b);
 
-	for (int i = 0; i < threadNumber - 1; i++)
+	for (int i = 0; i < threadNumber ; i++)
 		threads[i].join();
 	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 
