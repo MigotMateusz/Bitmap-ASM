@@ -8,7 +8,9 @@
 .model flat,stdcall
 
 .data
+gaussMatrix BYTE 1,2,1,2,4,2,1,2,1
 endPoint dword ?
+
 
 .code
 
@@ -32,7 +34,7 @@ MyProc1 endp
 ;parametry wejœciowe procedury: BMP jest tablic¹ pixeli bitmapy, imageWidth - szerokoœæ obrazu, startHeight i endHeight - numery wierszy, dla których funkcja ma obliczyæ histogram
 ;red, green, blue - wskaŸniki do tablic, które przetrzymuj¹ obliczony histogram 
 ;------------------------------
-Histogram proc BMP: PTR BYTE, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD, red: PTR DWORD, green: PTR DWORD, blue: PTR DWORD 
+histogram proc BMP: PTR BYTE, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD, red: PTR DWORD, green: PTR DWORD, blue: PTR DWORD 
 
 mov eax, imageWidth
 mov ebx, 3
@@ -45,8 +47,8 @@ mov ebx, 3
 mul ebx ; width
 mov ebx, endHeight
 mul ebx
-;sub eax, 2
 mov endPoint, eax
+
 
 mainLoop:
 
@@ -112,8 +114,11 @@ Koniec:
 ret
 Histogram endp
 
-GaussBlur proc BMP: PTR BYTE, bmpSize: DWORD, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD
-LOCAL   imgWidth:DWORD
+gaussBlur proc BMP: PTR BYTE, bmpSize: DWORD, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD
+LOCAL   imgWidth:DWORD,
+        index:DWORD,
+        blurredPixel:DWORD,
+        endLoop:DWORD
 
 mov eax, imageWidth
 mov ebx, 3
@@ -125,29 +130,205 @@ mov ecx, eax
 mov eax, [imgWidth]
 mov ebx, endHeight
 mul ebx
-mov endPoint, eax
+mov endLoop, eax
 
 mainLoop:
+add ecx, 3
 ; i-width-3>=0
 mov eax, ecx
 sub eax, [imgWidth]
 sub eax, 3
 cmp eax, 0
-jb mainLoop
+jl mainLoop
 
 ; i +width+3 <size
 mov eax, ecx
 add eax, [imgWidth]
 add eax, 3
 cmp eax, bmpSize
-jae mainLoop
-
-
-add ecx,3
-
-cmp ecx, endPoint
 jae Koniec
-jmp mainLoop
+
+;MAIN PART OF FUNCTION
+mov [blurredPixel], 0
+
+;pierwszy index: i-width-3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+sub eax, 3 ; BMP[i-3]
+sub eax, [imgWidth]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 1
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;drugi index: i-width
+mov eax, dword ptr [BMP]
+add eax, ecx 
+; BMP[i-width]
+sub eax, [imgWidth]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 2
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;trzeci index: i-width+3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+sub eax, [imgWidth]
+add eax, 3 ; BMP[i-width+3]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 1
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+
+;czwarty index: i-3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+sub eax, 3; BMP[i-3]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 2
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;piaty index: i
+mov eax, dword ptr [BMP]
+add eax, ecx ; BMP[i]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 4
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;szosty index: i + 3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+add eax, 3  ; BMP[i+3]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 2
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;siodmy index: i+width-3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+sub eax, 3
+add eax, [imgWidth]; BMP[i+width-3]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 1
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;osmy index: i+width
+mov eax, dword ptr [BMP]
+add eax, ecx 
+add eax, [imgWidth]; BMP[i+width]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 2
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;dziewiaty index: i+width+3
+mov eax, dword ptr [BMP]
+add eax, ecx 
+add eax, [imgWidth]
+add eax, 3; BMP[i+width+3]
+mov ebx, ecx
+movzx ecx, byte ptr [eax]
+mov eax, ecx
+;zmiana wartosci pixela
+mov ecx, 1
+mul ecx
+mov ecx, eax
+mov eax, [blurredPixel]
+add eax, ecx
+mov [blurredPixel], eax
+
+mov ecx, ebx
+
+;Podzielenie wynikowego pixela przez 16
+mov eax, [blurredPixel]
+mov ebx, 16
+div ebx
+mov [blurredPixel], eax
+
+; aktualny pixel
+mov ebx, ecx
+mov ecx, dword ptr [BMP]
+add ecx, ebx
+mov dword ptr [ecx], eax
+
+mov ecx, ebx
+
+add ecx, 1
+
+mov ebx, [endLoop]
+cmp ecx, ebx
+jae Koniec
+jb mainLoop
 Koniec:
 ret
 GaussBlur endp
