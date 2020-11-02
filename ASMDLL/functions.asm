@@ -133,7 +133,7 @@ mul ebx
 mov endLoop, eax
 
 mainLoop:
-add ecx, 3
+inc ecx
 ; i-width-3>=0
 mov eax, ecx
 sub eax, [imgWidth]
@@ -310,20 +310,23 @@ mov [blurredPixel], eax
 mov ecx, ebx
 
 ;Podzielenie wynikowego pixela przez 16
-mov eax, [blurredPixel]
+mov eax, dword ptr[blurredPixel]
 mov ebx, 16
 div ebx
+;mov eax, dword ptr[blurredPixel]
+;cdq
+
+;sar eax, 4
+
 mov [blurredPixel], eax
 
 ; aktualny pixel
 mov ebx, ecx
 mov ecx, dword ptr [BMP]
 add ecx, ebx
-mov dword ptr [ecx], eax
+mov byte ptr [ecx], al
 
 mov ecx, ebx
-
-add ecx, 1
 
 mov ebx, [endLoop]
 cmp ecx, ebx

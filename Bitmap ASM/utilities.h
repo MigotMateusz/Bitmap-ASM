@@ -38,7 +38,5 @@ void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, i
 long long runFunctions(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads, bool dllType,
 	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2);
 
-void test(Image* image, short threadNumber, int* r, int* g, int* b);
-void runBlurFunctionASM(Image* image, short threadNumber);
 #endif // !UTILITIES_H
 
