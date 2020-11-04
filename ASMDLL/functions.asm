@@ -46,7 +46,6 @@ mov r12d, dword ptr[rbp+64]
 mov startHeight, r11
 mov endHeight, r12
 
-
 mov bmp, rcx
 mov red, rdx
 mov green, r8
@@ -65,54 +64,137 @@ mov rax, imgWidth
 imul rax, endHeight
 mov r12, rax
 
+createPacket:
+mov r11, bmp
+movdqu xmm0, [r11 + rcx]
+
 mainLoop:
 
-mov r11, bmp
-add r11, rcx ; BMP[i] address
-
-
-
-movzx r9, byte ptr [r11] ; BMP[i]
-imul r9, 4
-
-
-mov r8, blue
-add r8, r9 ;red[bmp[i]]
-mov eax, dword ptr[r8]
-
+pextrb rbx, xmm0, 0
+imul rbx, 4
+mov r9, blue
+add r9, rbx 
+mov eax, dword ptr [r9]
 inc rax
-mov dword ptr [r8], eax
+mov dword ptr [r9], eax
 
-inc rcx
-
-mov r11, bmp
-add r11, rcx ; BMP[i] address
-movzx r9, byte ptr [r11] ; BMP[i]
-imul r9, 4
-mov r8, green
-add r8, r9 ;red[bmp[i]]
-mov eax, dword ptr[r8]
+pextrb rbx, xmm0, 1
+imul rbx, 4
+mov r9, green
+add r9, rbx 
+mov eax, dword ptr [r9]
 inc rax
-mov dword ptr [r8], eax
+mov dword ptr [r9], eax
 
-
-inc rcx
-
-mov r11, bmp
-add r11, rcx ; BMP[i] address
-movzx r9, byte ptr [r11] ; BMP[i]
-imul r9, 4
-mov r8, red
-add r8, r9 ;red[bmp[i]]
-mov eax, dword ptr[r8]
+pextrb rbx, xmm0, 2
+imul rbx, 4
+mov r9, red
+add r9, rbx 
+mov eax, dword ptr [r9]
 inc rax
-mov dword ptr [r8], eax
+mov dword ptr [r9], eax
 
-inc rcx
+pextrb rbx, xmm0, 3
+imul rbx, 4
+mov r9, blue
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 4
+imul rbx, 4
+mov r9, green
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 5
+imul rbx, 4
+mov r9, red
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 6
+imul rbx, 4
+mov r9, blue
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 7
+imul rbx, 4
+mov r9, green
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 8
+imul rbx, 4
+mov r9, red
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 9
+imul rbx, 4
+mov r9, blue
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 10
+imul rbx, 4
+mov r9, green
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 11
+imul rbx, 4
+mov r9, red
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 12
+imul rbx, 4
+mov r9, blue
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 13
+imul rbx, 4
+mov r9, green
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+pextrb rbx, xmm0, 14
+imul rbx, 4
+mov r9, red
+add r9, rbx 
+mov eax, dword ptr [r9]
+inc rax
+mov dword ptr [r9], eax
+
+add rcx, 15
 
 cmp rcx, r12
 jae Koniec
-jmp mainLoop
+jmp createPacket
 
 Koniec:
 ret
