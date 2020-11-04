@@ -119,9 +119,164 @@ ret
 histogram endp
 
 
+;bmp -> rcx, bmpSize -> rdx, imageWidth -> r8, startHeight -> r9, endHeight -> stack
+gaussBlur proc
+LOCAL   pixels: PTR BYTE,
+        bmpSize: QWORD, 
+        imageWidth: QWORD,
+        startHeight: QWORD, 
+        endHeight: QWORD,
+        blurredPixel: QWORD
+
+xor r10, r10
+mov r10d, dword ptr[rbp+48]
+mov endHeight, r10
+
+mov pixels, rcx
+mov bmpSize, rdx
+mov startHeight, r9
 
 
-gaussBlur proc BMP: PTR BYTE, bmpSize: DWORD, imageWidth: DWORD, startHeight: DWORD, endHeight: DWORD
+mov rax, r8
+imul rax, 3
+mov imageWidth, rax
+imul rax, startHeight
+mov rcx, rax
+
+
+mov rax, imageWidth
+imul rax, endHeight
+mov r12, rax
+
+mainLoop:
+
+inc rcx
+; i-width-3>=0
+
+mov rax, rcx
+sub rax, imageWidth
+sub rax, 3
+cmp rax, 0
+jl mainLoop
+
+; i +width+3 <size
+mov rax, rcx
+add rax, imageWidth
+add rax, 3
+cmp rax, bmpSize
+jae Koniec
+
+;MAIN PART OF FUNCTION
+mov blurredPixel, 0
+
+;pierwszy index: i-width-3
+mov rax, pixels
+add rax, rcx 
+sub rax, 3 ; BMP[i-3]
+sub rax, imageWidth
+movzx r15, byte ptr [rax]
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;drugi index: i - width
+mov rax, pixels
+add rax, rcx
+sub rax, imageWidth
+movzx r15, byte ptr [rax]
+imul r15, 2
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;trzeci index: i - width + 3
+mov rax, pixels
+add rax, rcx
+sub rax, imageWidth
+add rax, 3
+movzx r15, byte ptr [rax]
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;czwarty index: i-3
+mov rax, pixels
+add rax, rcx 
+sub rax, 3 ; BMP[i-3]
+movzx r15, byte ptr [rax]
+imul r15, 2
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;piaty index: i
+mov rax, pixels
+add rax, rcx 
+movzx r15, byte ptr [rax]
+imul r15, 4
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;szosty index: i+3
+mov rax, pixels
+add rax, rcx 
+add rax, 3 ; BMP[i-3]
+movzx r15, byte ptr [rax]
+imul r15, 2
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;siodmy index: i+width-3
+mov rax, pixels
+add rax, rcx 
+sub rax, 3 ; BMP[i-3]
+add rax, imageWidth
+movzx r15, byte ptr [rax]
+imul r15, 1
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;osmy index: i+width
+mov rax, pixels
+add rax, rcx 
+add rax, imageWidth
+movzx r15, byte ptr [rax]
+imul r15, 2
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+;siodmy index: i+width+3
+mov rax, pixels
+add rax, rcx 
+add rax, 3 ; BMP[i-3]
+add rax, imageWidth
+movzx r15, byte ptr [rax]
+imul r15, 1
+mov rax, blurredPixel
+add rax, r15
+mov blurredPixel, rax
+
+
+;Podzielenie wynikowego pixela przez 16
+xor rax, rax
+mov rax, blurredPixel
+;mov r14, 16
+sar rax, 4
+mov blurredPixel, rax
+
+; aktualny pixel
+mov r14, pixels
+add r14, rcx
+mov byte ptr [r14], al
+
+cmp rcx, r12
+jae Koniec
+jmp mainLoop
+
 Koniec:
 ret
 GaussBlur endp
