@@ -11,7 +11,7 @@
 #include <iostream>
 #include "functions.h"
 
-void histogram(BYTE* pixels, int imageWidth, int startHeight, int endHeight, int* r, int* g, int* b) {
+void histogram(BYTE* pixels, int* r, int* g, int* b, int imageWidth, int startHeight, int endHeight) {
 	int width = imageWidth * 3;
 	for (int i = width * startHeight; i < width * endHeight - 2; i += 3) {
 		b[(int)pixels[i]]++;

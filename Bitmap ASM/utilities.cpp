@@ -11,7 +11,7 @@ typedef int(_stdcall* MyProc)(int, int);
 typedef void(_stdcall* MyFunc1)(BYTE*, int, int, int, int*, int*, int*);
 //typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
 typedef void(_stdcall* MyFunc2)(BYTE*, int, int, int, int);
-typedef void(_stdcall* Pom1)(BYTE*, int, int, int, int*, int*, int*);
+typedef void(_stdcall* Pom1)(BYTE*, int*, int*, int*, int, int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
@@ -192,10 +192,10 @@ void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, i
 	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < threadNumber - 1; i++)
-		threads[i] = std::thread(histogram2, image->pixels, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts, r, g, b);
+		threads[i] = std::thread(histogram2, image->pixels, r, g, b, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
 
-	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
-		image->info_header->biHeight - 1, r, g, b);
+	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, r, g, b, image->info_header->biWidth, (threadNumber - 1) * divideParts,
+		image->info_header->biHeight - 1);
 
 	for (int i = 0; i < threadNumber; i++)
 		threads[i].join();
