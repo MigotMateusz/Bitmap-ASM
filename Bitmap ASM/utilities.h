@@ -33,8 +33,8 @@ void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMea
 HINSTANCE loadLibrary(bool isCppChosen);
 void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualization::Charting::Chart^ chart1);
 
-void runBlurFunction(HINSTANCE library, Image* image, short threadNumber);
-void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b);
+long long runBlurFunction(HINSTANCE library, Image* image, short threadNumber);
+long long runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b);
 long long runFunctions(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads, bool dllType,
 	System::Windows::Forms::DataVisualization::Charting::Chart^ chart1, System::Windows::Forms::DataVisualization::Charting::Chart^ chart2);
 

@@ -7,11 +7,8 @@
 #include <vector>
 #include "utilities.h"
 
-typedef int(_stdcall* MyProc)(int, int);
-typedef void(_stdcall* MyFunc1)(BYTE*, int, int, int, int*, int*, int*);
-//typedef void(_stdcall* MyFunc1)(BYTE*, int, int*, int*, int*);
-typedef void(_stdcall* MyFunc2)(BYTE*, int, int, int, int);
-typedef void(_stdcall* Pom1)(BYTE*, int*, int*, int*, int, int, int);
+typedef void(_stdcall* GuassBlur)(BYTE*, int, int, int, int);
+typedef void(_stdcall* Histogram)(BYTE*, int*, int*, int*, int, int, int);
 
 bool validateStartingParameters(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads){
 	int length = inputfileName->Length;
@@ -38,14 +35,28 @@ bool validateStartingParameters(System::String^ inputfileName, System::String^ o
 		return false;
 	}
 
-	else if (pomThreads[0] == '\0') {
+	if (pomThreads[0] == '\0') {
 		System::Windows::Forms::MessageBox::Show("Proszê wybraæ liczbê w¹tków do wykonania programu.", "Niepoprawna liczba w¹tków",
 			System::Windows::Forms::MessageBoxButtons::OK);
 		return false;
+	} else if (atoi(pomThreads) <= 0 && atoi(pomThreads) > 64) {
+		System::Windows::Forms::MessageBox::Show("Proszê wybraæ liczbê w¹tków w zakresie od 1 do 64.", "Niepoprawna liczba w¹tków",
+			System::Windows::Forms::MessageBoxButtons::OK);
+		return false;
 	}
-
-	else
+	else {
+		length = strlen(pomThreads);
+		for (int i = 0; i < length; i++) {
+			if (!isdigit(pomThreads[i]))
+			{
+				System::Windows::Forms::MessageBox::Show("Proszê wybraæ liczbê w¹tków w zakresie od 1 do 64.", "Niepoprawna liczba w¹tków",
+					System::Windows::Forms::MessageBoxButtons::OK);
+				return false;
+			}
+		}	
 		return true;
+	}
+	
 }
 
 long long runFunctions(System::String^ inputfileName, System::String^ outputfileName, System::String^ numberOfThreads, bool dllType, 
@@ -69,14 +80,10 @@ long long runFunctions(System::String^ inputfileName, System::String^ outputfile
 	int red[256] = {}, green[256] = {}, blue[256] = {};
 	int red1[256] = {}, green1[256] = {}, blue1[256] = {};
 
-	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
-	runHistogramFunction(lib, image, nThreads, red, green, blue);
-	runBlurFunction(lib, image, nThreads);
-	runHistogramFunction(lib, image, nThreads, red1, green1, blue1);
-	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-
-	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-	std::cerr << "Time: " << time << std::endl;
+	long long time = 0;
+	time += runHistogramFunction(lib, image, nThreads, red, green, blue);
+	time += runBlurFunction(lib, image, nThreads);
+	time += runHistogramFunction(lib, image, nThreads, red1, green1, blue1);
 	showHistogram(red, green, blue, chart1);
 	showHistogram(red1, green1, blue1, chart2);
 	saveBMP(image, outfileName);
@@ -162,18 +169,18 @@ void showHistogram(int* r, int* g, int* b, System::Windows::Forms::DataVisualiza
 	}
 }
 
-void runBlurFunction(HINSTANCE library, Image* image, short threadNumber) {
-	MyFunc2 gaussBlur1 = (MyFunc2)GetProcAddress(library, "gaussBlur");
+long long runBlurFunction(HINSTANCE library, Image* image, short threadNumber) {
+	GuassBlur gaussBlur1 = (GuassBlur)GetProcAddress(library, "gaussBlur");
 	int divideParts = image->info_header->biHeight / threadNumber;	
 	std::thread *threads = new std::thread[threadNumber];
-
-	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < threadNumber - 1; i++)
 		threads[i] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
 
 	threads[threadNumber - 1] = std::thread(gaussBlur1, image->pixels, image->size, image->info_header->biWidth, (threadNumber - 1) * divideParts, 
 		image->info_header->biHeight - 1);
+
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < threadNumber; i++)
 		threads[i].join();
@@ -182,14 +189,13 @@ void runBlurFunction(HINSTANCE library, Image* image, short threadNumber) {
 
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time Blur: " << time << std::endl;
+	return time;
 }
 
-void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b) {
-	Pom1 histogram2 = (Pom1)GetProcAddress(library, "histogram");
+long long runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, int* r, int* g, int* b) {
+	Histogram histogram2 = (Histogram)GetProcAddress(library, "histogram");
 	int divideParts = image->info_header->biHeight / threadNumber;
 	std::thread* threads = new std::thread[threadNumber];
-
-	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < threadNumber - 1; i++)
 		threads[i] = std::thread(histogram2, image->pixels, r, g, b, image->info_header->biWidth, i * divideParts, (i + 1) * divideParts);
@@ -197,11 +203,13 @@ void runHistogramFunction(HINSTANCE library, Image* image, short threadNumber, i
 	threads[threadNumber - 1] = std::thread(histogram2, image->pixels, r, g, b, image->info_header->biWidth, (threadNumber - 1) * divideParts,
 		image->info_header->biHeight - 1);
 
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
 	for (int i = 0; i < threadNumber; i++)
 		threads[i].join();
 	std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	std::cerr << "Time histogram: " << time << std::endl;
-
+	return time;
 }

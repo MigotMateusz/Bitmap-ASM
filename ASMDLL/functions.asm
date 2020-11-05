@@ -6,7 +6,34 @@
 ;---------------------------------------------------------------------
 
 .data
-gaussMatrix BYTE 1,2,1,2,4,2,1,2,1
+gaussMatrix:
+word 1
+word 1
+word 1
+word 2
+word 2
+word 2
+word 1
+word 1
+word 1
+word 2
+word 2
+word 2
+word 4
+word 4
+word 4
+word 2
+word 2
+word 2
+word 1
+word 1
+word 1
+word 2
+word 2
+word 2
+word 1
+word 1
+word 1
 
 
 .code
@@ -34,6 +61,7 @@ LOCAL startHeight: QWORD,
       red: PTR DWORD,
       green: PTR DWORD,
       blue: PTR DWORD
+
 
 xor r10,r10
 xor r11,r11
@@ -210,11 +238,21 @@ LOCAL   pixels: PTR BYTE,
         endHeight: QWORD,
         blurredPixel: QWORD
 
+movdqu xmm0, oword ptr[gaussMatrix]
+movdqu xmm1, oword ptr[gaussMatrix + 6]
+movdqu xmm2, oword ptr[gaussMatrix + 12]
+
+movdqu xmm3, oword ptr[gaussMatrix + 18]
+movdqu xmm4, oword ptr[gaussMatrix + 24]
+movdqu xmm5, oword ptr[gaussMatrix + 30]
+
+
 xor r10, r10
 mov r10d, dword ptr[rbp+48]
 mov endHeight, r10
 
 mov pixels, rcx
+mov r15, rcx
 mov bmpSize, rdx
 mov startHeight, r9
 
@@ -249,111 +287,77 @@ cmp rax, bmpSize
 jae Koniec
 
 ;MAIN PART OF FUNCTION
-mov blurredPixel, 0
 
 ;pierwszy index: i-width-3
 mov rax, pixels
 add rax, rcx 
-sub rax, 3 ; BMP[i-3]
 sub rax, imageWidth
-movzx r15, byte ptr [rax]
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
+sub rax, 3
 
-;drugi index: i - width
-mov rax, pixels
-add rax, rcx
-sub rax, imageWidth
-movzx r15, byte ptr [rax]
-imul r15, 2
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
-
-;trzeci index: i - width + 3
-mov rax, pixels
-add rax, rcx
-sub rax, imageWidth
+pmovzxbw xmm6, [rax]
 add rax, 3
-movzx r15, byte ptr [rax]
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
+pmovzxbw xmm7, [rax]
+add rax, 3
+pmovzxbw xmm8, [rax]
 
-;czwarty index: i-3
-mov rax, pixels
-add rax, rcx 
-sub rax, 3 ; BMP[i-3]
-movzx r15, byte ptr [rax]
-imul r15, 2
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
-
-;piaty index: i
-mov rax, pixels
-add rax, rcx 
-movzx r15, byte ptr [rax]
-imul r15, 4
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
-
-;szosty index: i+3
-mov rax, pixels
-add rax, rcx 
-add rax, 3 ; BMP[i-3]
-movzx r15, byte ptr [rax]
-imul r15, 2
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
-
-;siodmy index: i+width-3
-mov rax, pixels
-add rax, rcx 
-sub rax, 3 ; BMP[i-3]
 add rax, imageWidth
-movzx r15, byte ptr [rax]
-imul r15, 1
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
+pmovzxbw xmm9, [rax]
+sub rax, 3
+pmovzxbw xmm10, [rax]
+sub rax, 3
+pmovzxbw xmm11, [rax]
 
-;osmy index: i+width
-mov rax, pixels
-add rax, rcx 
 add rax, imageWidth
-movzx r15, byte ptr [rax]
-imul r15, 2
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
+pmovzxbw xmm12, [rax]
+add rax, 3
+pmovzxbw xmm13, [rax]
+add rax, 3
+pmovzxbw xmm14, [rax]
 
-;siodmy index: i+width+3
-mov rax, pixels
-add rax, rcx 
-add rax, 3 ; BMP[i-3]
-add rax, imageWidth
-movzx r15, byte ptr [rax]
-imul r15, 1
-mov rax, blurredPixel
-add rax, r15
-mov blurredPixel, rax
+pmullw xmm6, xmm0
+pmullw xmm7, xmm1
+pmullw xmm8, xmm2
 
+pmullw xmm9, xmm3
+pmullw xmm10, xmm4
+pmullw xmm11, xmm5
 
-;Podzielenie wynikowego pixela przez 16
-xor rax, rax
-mov rax, blurredPixel
-;mov r14, 16
-sar rax, 4
-mov blurredPixel, rax
+pmullw xmm12, xmm0
+pmullw xmm13, xmm1
+pmullw xmm14, xmm2
+
+paddw xmm6, xmm7
+paddw xmm6, xmm8
+paddw xmm6, xmm9
+paddw xmm6, xmm10
+paddw xmm6, xmm11
+paddw xmm6, xmm12
+paddw xmm6, xmm13
+paddw xmm6, xmm14
+
+psrlw xmm6, 4
 
 ; aktualny pixel
-mov r14, pixels
-add r14, rcx
-mov byte ptr [r14], al
+;mov ebx, ecx
+;mov ecx, dword ptr [BMP]
+;add ecx, ebx
+;mov byte ptr [ecx], al
+
+pextrw r9, xmm6, 0
+pextrw r10, xmm6, 1
+pextrw r14, xmm6, 2
+
+
+mov r11, pixels
+add r11, rcx 
+
+mov byte ptr[r11], r9b
+add r11, 1
+mov byte ptr[r11], r10b
+add r11, 1
+mov byte ptr[r11], r14b
+
+add rcx, 1
 
 cmp rcx, r12
 jae Koniec
