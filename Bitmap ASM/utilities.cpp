@@ -161,11 +161,20 @@ void readLogFile(System::Windows::Forms::ListView^ listView) {
 	inputFile.close(); 
 }
 
-void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure) {
-	System::String^ text = gcnew System::String(newMeasure.c_str());
+void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure,
+	bool isCppChosen, System::String^ numberOfThreads) {
+	System::String^ library;
+	if (isCppChosen)
+		library = "CppDLL";
+	else
+		library = "ASMDLL";
+	System::String^ text = gcnew System::String(newMeasure.c_str()) + " " + library + " " +" Liczba w¹tków -> " + numberOfThreads;
 	listView->Items->Add(text);
+	int length = text->Length;
+	char* textChar = new char[length];
+	sprintf(textChar, "%s", text);
 	std::fstream outputFile("measures.txt", std::ios::app);
-	outputFile << std::endl << newMeasure;
+	outputFile << std::endl << textChar;
 	outputFile.close();
 }
 

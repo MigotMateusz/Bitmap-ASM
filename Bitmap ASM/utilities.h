@@ -60,7 +60,8 @@ bool checkFileExtension(char* fileName);
 void readLogFile(System::Windows::Forms::ListView^ listView);
 
 /*funkcja addToLogFile ma za zadanie dodanie czasu wykonania siê algorytmu do pliku tekstowego oraz wyœwietlenie go na liœcie czasów*/
-void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure);
+void addToLogFile(System::Windows::Forms::ListView^ listView, std::string newMeasure,
+	bool isCppChosen, System::String^ numberOfThreads);
 
 /*funkcja loadLibrary ma za zadanie za³adowanie biblioteki w zale¿noœci od opcji, któr¹ wybra³ u¿ytkownik
 * funkcja zwraca za³adowan¹ bibliotekê

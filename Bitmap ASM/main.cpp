@@ -21,8 +21,6 @@
 #include "pch.h"
 #include "Form1.h"
 
-
-//[STAThread]
 int main() {
 	System::Windows::Forms::Application::EnableVisualStyles();
 	System::Windows::Forms::Application::SetCompatibleTextRenderingDefault(false);
